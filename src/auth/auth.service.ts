@@ -16,7 +16,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // 1. ĐĂNG KÝ
+  // ĐĂNG KÝ
   async register(dto: RegisterDto) {
     const existUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -39,7 +39,7 @@ export class AuthService {
     return result;
   }
 
-  // 2. ĐĂNG NHẬP
+  // ĐĂNG NHẬP
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },

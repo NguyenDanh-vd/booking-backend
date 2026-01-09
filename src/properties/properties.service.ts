@@ -8,7 +8,7 @@ import { FilterPropertyDto } from './dto/filter-property.dto';
 export class PropertiesService {
   constructor(private prisma: PrismaService) {}
 
-  // 1. Tạo phòng mới (Cần userId để biết ai là chủ)
+  // Tạo phòng mới (Cần userId để biết ai là chủ)
   async create(userId: number, dto: CreatePropertyDto) {
     return this.prisma.properties.create({
       data: {
@@ -18,11 +18,11 @@ export class PropertiesService {
     });
   }
 
-  // 2. Lấy danh sách tất cả phòng (Public)
+  // Lấy danh sách tất cả phòng (Public)
   async findAll(query: FilterPropertyDto) {
     const { search, minPrice, maxPrice, page = 1, limit = 10 } = query;
 
-    // 1. Xây dựng điều kiện lọc (Where Clause)
+    // Xây dựng điều kiện lọc (Where Clause)
     const where: any = {};
 
     // Nếu có từ khóa tìm kiếm
@@ -40,10 +40,10 @@ export class PropertiesService {
       if (maxPrice) where.pricePerNight.lte = maxPrice; // Nhỏ hơn hoặc bằng
     }
 
-    // 2. Tính toán phân trang
+    // Tính toán phân trang
     const skip = (page - 1) * limit;
 
-    // 3. Thực hiện truy vấn
+    // Thực hiện truy vấn
     const [data, total] = await Promise.all([
       this.prisma.properties.findMany({
         where,
@@ -66,7 +66,7 @@ export class PropertiesService {
     };
   }
 
-  // 3. Xem chi tiết 1 phòng
+  // Xem chi tiết 1 phòng
   async findOne(id: number) {
     const property = await this.prisma.properties.findUnique({
       where: { id },
@@ -78,7 +78,7 @@ export class PropertiesService {
     return property;
   }
 
-  // 4. Cập nhật phòng (Chỉ chủ nhà mới được sửa)
+  // Cập nhật phòng (Chỉ chủ nhà mới được sửa)
   async update(id: number, userId: number, dto: UpdatePropertyDto) {
     // Check xem phòng có tồn tại và đúng chủ không
     const property = await this.prisma.properties.findUnique({ where: { id } });
@@ -94,7 +94,7 @@ export class PropertiesService {
     });
   }
 
-  // 5. Xóa phòng
+  // Xóa phòng
   async remove(id: number, userId: number) {
     const property = await this.prisma.properties.findUnique({ where: { id } });
     

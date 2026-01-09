@@ -6,7 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // 1. Lấy thông tin chi tiết user
+  // Lấy thông tin chi tiết user
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -19,7 +19,7 @@ export class UsersService {
     return result;
   }
 
-  // 2. Cập nhật thông tin
+  // Cập nhật thông tin
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.update({
       where: { id },

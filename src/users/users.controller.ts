@@ -13,7 +13,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly cloudinaryService: CloudinaryService // 👈 Inject Service Upload
+    private readonly cloudinaryService: CloudinaryService
   ) {}
 
   @Get('profile')
@@ -21,7 +21,7 @@ export class UsersController {
     return this.usersService.findOne(req.user.id);
   }
 
-  // 👇 API UPDATE (Kèm upload ảnh) 👇
+  // API UPDATE (Kèm upload ảnh)
   @Patch('profile')
   @UseInterceptors(FileInterceptor('avatar')) // 'avatar' là tên key trong Form Data
   async update(

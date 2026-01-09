@@ -9,12 +9,12 @@ export class BookingsService {
   async create(userId: number, dto: CreateBookingDto) {
     const { propertyId, checkIn, checkOut } = dto;
     
-    // 1. Chuyển string sang Date object để so sánh
+    // 1. Kiểm tra dữ liệu ngày tháng
     const startDate = new Date(checkIn);
     const endDate = new Date(checkOut);
     const now = new Date();
 
-    // Validate ngày tháng
+    // Xoá phần thời gian để chỉ so sánh ngày
     if (startDate < now) {
       throw new BadRequestException('Ngày check-in không được ở trong quá khứ');
     }
@@ -22,15 +22,13 @@ export class BookingsService {
       throw new BadRequestException('Ngày check-out phải sau ngày check-in');
     }
 
-    // 2. Tìm phòng để lấy giá tiền
+    // Kiểm tra phòng có tồn tại không
     const property = await this.prisma.properties.findUnique({
       where: { id: propertyId },
     });
     if (!property) throw new NotFoundException('Phòng không tồn tại');
 
-    // 3. KIỂM TRA TRÙNG LỊCH (Logic quan trọng nhất)
-    // Tìm xem có booking nào ĐANG TỒN TẠI mà thời gian bị trùng không
-    // Công thức: (NewStart < ExistingEnd) AND (NewEnd > ExistingStart)
+    // Kiểm tra phòng đã được đặt trong khoảng thời gian này chưa
     const conflictingBooking = await this.prisma.booking.findFirst({
       where: {
         propertyId: propertyId,
@@ -46,12 +44,12 @@ export class BookingsService {
       throw new BadRequestException('Phòng đã kín lịch trong khoảng thời gian này!');
     }
 
-    // 4. Tính tiền
+    // Tính tiền
     const oneDay = 24 * 60 * 60 * 1000; // mili giây
     const diffDays = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
     const totalPrice = Number(property.pricePerNight) * diffDays;
 
-    // 5. Tạo Booking
+    // Tạo Booking
     return this.prisma.booking.create({
       data: {
         checkIn: startDate,

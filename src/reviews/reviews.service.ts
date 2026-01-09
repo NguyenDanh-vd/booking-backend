@@ -7,25 +7,25 @@ export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: number, dto: CreateReviewDto) {
-    // 1. Kiểm tra đơn đặt phòng có tồn tại không
+    // Kiểm tra đơn đặt phòng có tồn tại không
     const booking = await this.prisma.booking.findUnique({
       where: { id: dto.bookingId },
     });
 
     if (!booking) throw new NotFoundException('Đơn đặt phòng không tồn tại');
 
-    // 2. Kiểm tra quyền: Chỉ người đặt (Guest) mới được review
+    // Kiểm tra quyền: Chỉ người đặt (Guest) mới được review
     if (booking.guestId !== userId) {
       throw new ForbiddenException('Bạn không có quyền đánh giá đơn phòng này');
     }
 
-    // 3. Kiểm tra xem đã review chưa (Vì bookingId là unique trong bảng Review)
+    // Kiểm tra xem đã review chưa (Vì bookingId là unique trong bảng Review)
     const existReview = await this.prisma.review.findUnique({
       where: { bookingId: dto.bookingId },
     });
     if (existReview) throw new BadRequestException('Bạn đã đánh giá đơn này rồi');
 
-    // 4. Tạo review
+    // Tạo review
     return this.prisma.review.create({
       data: {
         bookingId: dto.bookingId,

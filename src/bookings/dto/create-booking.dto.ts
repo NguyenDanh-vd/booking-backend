@@ -6,7 +6,7 @@ export class CreateBookingDto {
   propertyId: number;
 
   @IsNotEmpty()
-  @IsDateString() // Bắt buộc định dạng ngày tháng (YYYY-MM-DD)
+  @IsDateString() //(YYYY-MM-DD)
   checkIn: string;
 
   @IsNotEmpty()
