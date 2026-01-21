@@ -8,101 +8,124 @@ import { FilterPropertyDto } from './dto/filter-property.dto';
 export class PropertiesService {
   constructor(private prisma: PrismaService) {}
 
-  // Tạo phòng mới (Cần userId để biết ai là chủ)
+  // 0. Đếm tổng số phòng
+  async countAll() {
+    return this.prisma.properties.count();
+  }
+
+  // 1. Tạo phòng mới
   async create(userId: number, dto: CreatePropertyDto) {
     return this.prisma.properties.create({
       data: {
         ...dto,
-        ownerId: userId, // Gán chủ sở hữu
+        pricePerNight: Number(dto.pricePerNight),
+        ownerId: userId,
       },
     });
   }
 
-  // Lấy danh sách tất cả phòng (Public)
+  // 2. Lấy danh sách phòng (public + filter + phân trang)
   async findAll(query: FilterPropertyDto) {
     const { search, minPrice, maxPrice, page = 1, limit = 10 } = query;
 
-    // Xây dựng điều kiện lọc (Where Clause)
-    const where: any = {};
+    const where: any = {
+      status: 'ACTIVE',
+    };
 
-    // Nếu có từ khóa tìm kiếm
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } }, // Tìm trong tên (không phân biệt hoa thường)
-        { address: { contains: search, mode: 'insensitive' } }, // Tìm trong địa chỉ
+        { title: { contains: search, mode: 'insensitive' } },
+        { address: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    // Nếu có lọc giá
     if (minPrice || maxPrice) {
       where.pricePerNight = {};
-      if (minPrice) where.pricePerNight.gte = minPrice; // Lớn hơn hoặc bằng
-      if (maxPrice) where.pricePerNight.lte = maxPrice; // Nhỏ hơn hoặc bằng
+      if (minPrice) where.pricePerNight.gte = Number(minPrice);
+      if (maxPrice) where.pricePerNight.lte = Number(maxPrice);
     }
 
-    // Tính toán phân trang
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
 
-    // Thực hiện truy vấn
     const [data, total] = await Promise.all([
       this.prisma.properties.findMany({
         where,
         skip,
         take: Number(limit),
         include: {
-          owner: { select: { fullName: true, avatar: true } }, // Kèm thông tin chủ
-          amenities: { include: { amenity: true } }, // Kèm tiện ích (nếu có)
+          owner: { select: { fullName: true, avatar: true } },
         },
-        orderBy: { createdAt: 'desc' }, // Phòng mới nhất lên đầu
+        orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.properties.count({ where }), // Đếm tổng số lượng kết quả
+      this.prisma.properties.count({ where }),
     ]);
 
     return {
       data,
       total,
-      page,
-      lastPage: Math.ceil(total / limit),
+      page: Number(page),
+      lastPage: Math.ceil(total / Number(limit)),
     };
   }
 
-  // Xem chi tiết 1 phòng
+  // 3. Xem chi tiết 1 phòng
   async findOne(id: number) {
     const property = await this.prisma.properties.findUnique({
       where: { id },
       include: {
-        owner: { select: { fullName: true, email: true, phone: true } },
+        owner: {
+          select: {
+            fullName: true,
+            email: true,
+            phone: true,
+            avatar: true,
+          },
+        },
       },
     });
+
     if (!property) throw new NotFoundException('Không tìm thấy phòng này');
     return property;
   }
 
-  // Cập nhật phòng (Chỉ chủ nhà mới được sửa)
+  // 4. Cập nhật phòng
   async update(id: number, userId: number, dto: UpdatePropertyDto) {
-    // Check xem phòng có tồn tại và đúng chủ không
     const property = await this.prisma.properties.findUnique({ where: { id } });
-    
+
     if (!property) throw new NotFoundException('Phòng không tồn tại');
     if (property.ownerId !== userId) {
       throw new ForbiddenException('Bạn không có quyền sửa phòng này');
     }
 
+    const dataToUpdate: any = { ...dto };
+
+    if (dto.pricePerNight !== undefined) {
+      dataToUpdate.pricePerNight = Number(dto.pricePerNight);
+    }
+
     return this.prisma.properties.update({
       where: { id },
-      data: dto,
+      data: dataToUpdate,
     });
   }
 
-  // Xóa phòng
+  // 5. Xóa phòng
   async remove(id: number, userId: number) {
     const property = await this.prisma.properties.findUnique({ where: { id } });
-    
+
     if (!property) throw new NotFoundException('Phòng không tồn tại');
     if (property.ownerId !== userId) {
       throw new ForbiddenException('Bạn không có quyền xóa phòng này');
     }
 
     return this.prisma.properties.delete({ where: { id } });
+  }
+
+  // 6. Lấy danh sách phòng của host
+  async findAllByOwner(userId: number) {
+    return this.prisma.properties.findMany({
+      where: { ownerId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }

@@ -10,6 +10,13 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { PropertiesModule } from './properties/properties.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { WishlistModule } from './wishlist/wishlist.module';
+import { LocationsModule } from './locations/locations.module';
+import { AmenitiesModule } from './amenities/amenities.module';
+import { PaymentsModule } from './payments/payments.module';
+import { MessagesModule } from './messages/messages.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -24,6 +31,13 @@ import { ReviewsModule } from './reviews/reviews.module';
     PropertiesModule,
     BookingsModule,
     ReviewsModule,
+    WishlistModule,
+    LocationsModule,
+    AmenitiesModule,
+    PaymentsModule,
+    MessagesModule,
+    NotificationsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

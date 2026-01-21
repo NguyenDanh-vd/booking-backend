@@ -6,7 +6,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, // Tự động loại bỏ các trường không có trong DTO (Bảo mật)
+    transform: true, // Tự động chuyển đổi kiểu dữ liệu (VD: "123" -> 123)
+    transformOptions: {
+      enableImplicitConversion: true, // Hỗ trợ chuyển đổi ngầm định cho FormData
+    },
+  }));
   
   app.enableCors({
     origin: '*',

@@ -12,4 +12,7 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   avatar?: string; // Tạm thời là string url, sau này sẽ upload file
+  @IsOptional()
+  @IsString()
+  role?: 'GUEST' | 'HOST' | 'ADMIN';
 }
