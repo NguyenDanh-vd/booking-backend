@@ -27,10 +27,17 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+<<<<<<< HEAD
     "@nestjs/platform-socket.io": "^11.1.12",
     "@nestjs/swagger": "^11.2.4",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.12",
+=======
+    "@nestjs/platform-socket.io": "^11.1.13",
+    "@nestjs/swagger": "^11.2.4",
+    "@nestjs/typeorm": "^11.0.0",
+    "@nestjs/websockets": "^11.1.13",
+>>>>>>> upstream/main
     "@prisma/client": "^5.22.0",
     "@types/multer": "^2.0.0",
     "bcrypt": "^6.0.0",
@@ -44,6 +51,10 @@
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
+<<<<<<< HEAD
+=======
+    "stripe": "^20.3.0",
+>>>>>>> upstream/main
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.28"
   },

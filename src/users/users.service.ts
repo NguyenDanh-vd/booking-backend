@@ -4,7 +4,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+<<<<<<< HEAD
   constructor(private prisma: PrismaService) {}
+=======
+  constructor(private prisma: PrismaService) { }
+>>>>>>> upstream/main
 
   // 0. Đếm tổng số user
   async countAll() {
@@ -58,4 +62,15 @@ export class UsersService {
     const users = await this.prisma.user.findMany();
     return users.map(({ password, ...rest }) => rest);
   }
+<<<<<<< HEAD
+=======
+
+  // 5. ADMIN: lấy danh sách user theo role
+  async findByRole(role: 'GUEST' | 'HOST' | 'ADMIN') {
+    const users = await this.prisma.user.findMany({
+      where: { role },
+    });
+    return users.map(({ password, ...rest }) => rest);
+  }
+>>>>>>> upstream/main
 }

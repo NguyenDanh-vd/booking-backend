@@ -2,7 +2,11 @@ import { BookingsService } from '../bookings/bookings.service';
 import { PropertiesService } from '../properties/properties.service';
 import {
   Controller, Get, Body, Patch, UseGuards, Request,
+<<<<<<< HEAD
   UseInterceptors, UploadedFile, BadRequestException, Param
+=======
+  UseInterceptors, UploadedFile, BadRequestException, Param, Query
+>>>>>>> upstream/main
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -73,7 +77,14 @@ export class UsersController {
   @Get('/admin/users')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
+<<<<<<< HEAD
   async getAllUsers() {
+=======
+  async getAllUsers(@Query('role') role?: string) {
+    if (role) {
+      return this.usersService.findByRole(role as 'GUEST' | 'HOST' | 'ADMIN');
+    }
+>>>>>>> upstream/main
     return this.usersService.findAll();
   }
 }
