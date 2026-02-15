@@ -1,23 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-<<<<<<< HEAD
-
-@Injectable()
-export class NotificationsService {
-  constructor(private prisma: PrismaService) {}
-
-  // 1. Tạo thông báo mới (Thường được gọi từ các Service khác)
-  async create(dto: CreateNotificationDto) {
-    return this.prisma.notification.create({
-      data: {
-        userId: dto.userId,
-        title: dto.title,
-        message: dto.message,
-        type: dto.type,
-      },
-    });
-=======
 import { NotificationsGateway } from './notifications.gateway';
 
 @Injectable()
@@ -57,15 +40,12 @@ export class NotificationsService {
     this.notificationsGateway.sendNotificationToAdmin(savedNotification);
 
     return savedNotification;
->>>>>>> upstream/main
   }
 
   // 2. Lấy danh sách thông báo của User
   async findAllByUser(userId: number) {
     return this.prisma.notification.findMany({
       where: { userId },
-<<<<<<< HEAD
-=======
       include: {
         sender: {
           select: {
@@ -76,7 +56,6 @@ export class NotificationsService {
           },
         },
       },
->>>>>>> upstream/main
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -89,38 +68,23 @@ export class NotificationsService {
     });
   }
 
-<<<<<<< HEAD
-    // 4. ADMIN: Lấy toàn bộ notification
-  async findAll() {
-    return this.prisma.notification.findMany({
-      include: {
-        user: {
-=======
   // 4. ADMIN: Lấy toàn bộ notification
   async findAll() {
     return this.prisma.notification.findMany({
       include: {
         user: { // Người nhận
->>>>>>> upstream/main
           select: {
             fullName: true,
             email: true,
           },
         },
-<<<<<<< HEAD
-=======
         sender: { // Người gửi (Khách hàng) - Thêm cái này để Admin biết ai gửi
           select: {
             fullName: true,
           }
         }
->>>>>>> upstream/main
       },
       orderBy: { createdAt: 'desc' },
     });
   }
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main
 }

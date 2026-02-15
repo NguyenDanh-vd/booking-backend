@@ -8,14 +8,6 @@ export class PaymentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService // 👈 Inject vào đây
-<<<<<<< HEAD
-  ) {}
-
-  // 1. Tạo thanh toán
-  async create(createPaymentDto: CreatePaymentDto) {
-    const { bookingId, provider } = createPaymentDto;
-
-=======
   ) { }
 
   // 1. Tạo thanh toán
@@ -24,18 +16,11 @@ export class PaymentsService {
 
     console.log('Payment attempt:', { bookingId, provider, userId });
 
->>>>>>> upstream/main
     // A. Kiểm tra Booking
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
     });
 
-<<<<<<< HEAD
-    if (!booking) throw new NotFoundException('Đơn đặt phòng không tồn tại');
-    if (booking.status === 'CONFIRMED') throw new BadRequestException('Đơn này đã được thanh toán rồi');
-    if (booking.status === 'CANCELLED') throw new BadRequestException('Đơn này đã bị hủy, không thể thanh toán');
-
-=======
     console.log('Booking found:', booking);
 
     if (!booking) throw new NotFoundException('Đơn đặt phòng không tồn tại');
@@ -50,18 +35,13 @@ export class PaymentsService {
       console.log('Booking already confirmed, allowing re-payment');
     }
 
->>>>>>> upstream/main
     // B. Lưu thông tin thanh toán
     const payment = await this.prisma.payment.create({
       data: {
         bookingId,
         amount: booking.totalPrice,
         provider,
-<<<<<<< HEAD
-        status: 'SUCCESS',
-=======
         status: 'PENDING', // Thay đổi: bắt đầu với PENDING, chờ Host xác nhận
->>>>>>> upstream/main
         transactionCode: `TRANS_${Date.now()}`,
       },
     });
@@ -73,40 +53,17 @@ export class PaymentsService {
     });
 
     // 👇 D. BẮN THÔNG BÁO (ĐOẠN CODE BẠN YÊU CẦU) 👇
-<<<<<<< HEAD
-    
-    // 1. Thông báo cho Khách (Guest)
-    await this.notificationsService.create({
-        userId: booking.guestId,
-        title: 'Thanh toán thành công',
-        message: `Đơn đặt phòng #${booking.id} của bạn đã được xác nhận!`,
-        type: 'PAYMENT'
-=======
-
     // 1. Thông báo cho Khách (Guest)
     await this.notificationsService.create({
       userId: booking.guestId,
       title: 'Thanh toán thành công',
       message: `Đơn đặt phòng #${booking.id} của bạn đã được xác nhận!`,
       type: 'PAYMENT'
->>>>>>> upstream/main
     });
 
     // 2. Thông báo cho Chủ nhà (Host)
     // Cần tìm xem ai là chủ của cái property này
     const property = await this.prisma.properties.findUnique({
-<<<<<<< HEAD
-        where: { id: booking.propertyId }
-    });
-
-    if (property) {
-        await this.notificationsService.create({
-            userId: property.ownerId,
-            title: 'Bạn có đơn đặt phòng mới',
-            message: `Khách đã thanh toán cho đơn #${booking.id}. Chuẩn bị đón khách nhé!`,
-            type: 'BOOKING'
-        });
-=======
       where: { id: booking.propertyId }
     });
 
@@ -117,7 +74,6 @@ export class PaymentsService {
         message: `Khách đã thanh toán cho đơn #${booking.id}. Chuẩn bị đón khách nhé!`,
         type: 'BOOKING'
       });
->>>>>>> upstream/main
     }
 
     return payment;
@@ -129,9 +85,6 @@ export class PaymentsService {
       where: { bookingId },
     });
   }
-<<<<<<< HEAD
-    async findAllAdmin() {
-=======
 
   // 3. Lấy lịch sử thanh toán của user
   async findMyPayments(userId: number) {
@@ -246,7 +199,6 @@ export class PaymentsService {
   }
 
   async findAllAdmin() {
->>>>>>> upstream/main
     return this.prisma.payment.findMany({
       include: {
         booking: {
@@ -256,11 +208,7 @@ export class PaymentsService {
           },
         },
       },
-<<<<<<< HEAD
-      orderBy: { paymentDate: 'desc' }, 
-=======
       orderBy: { paymentDate: 'desc' },
->>>>>>> upstream/main
     });
   }
 

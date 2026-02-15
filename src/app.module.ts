@@ -17,10 +17,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { MessagesModule } from './messages/messages.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReportsModule } from './reports/reports.module';
-<<<<<<< HEAD
-=======
 import { PaymentModule } from './payment/payment.module';
->>>>>>> upstream/main
 
 @Module({
   imports: [
@@ -42,10 +39,7 @@ import { PaymentModule } from './payment/payment.module';
     MessagesModule,
     NotificationsModule,
     ReportsModule,
-<<<<<<< HEAD
-=======
     PaymentModule,
->>>>>>> upstream/main
   ],
   controllers: [AppController],
   providers: [AppService],

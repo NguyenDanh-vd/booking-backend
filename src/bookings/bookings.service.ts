@@ -1,12 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
-<<<<<<< HEAD
-
-@Injectable()
-export class BookingsService {
-  constructor(private prisma: PrismaService) {}
-=======
 import { NotificationsService } from 'src/notifications/notifications.service'; 
 
 @Injectable()
@@ -15,7 +9,6 @@ export class BookingsService {
     private prisma: PrismaService,
     private readonly notificationsService: NotificationsService 
   ) {}
->>>>>>> upstream/main
 
   // Đếm tổng booking
   async countAll() {
@@ -42,10 +35,7 @@ export class BookingsService {
     });
   }
 
-<<<<<<< HEAD
-=======
   // --- HÀM TẠO BOOKING ---
->>>>>>> upstream/main
   async create(userId: number, dto: CreateBookingDto) {
     const { propertyId, checkIn, checkOut } = dto;
 
@@ -69,10 +59,7 @@ export class BookingsService {
     });
     if (!property) throw new NotFoundException('Phòng không tồn tại');
 
-<<<<<<< HEAD
-=======
     // Kiểm tra trùng lịch
->>>>>>> upstream/main
     const conflictingBooking = await this.prisma.booking.findFirst({
       where: {
         propertyId,
@@ -88,22 +75,15 @@ export class BookingsService {
       throw new BadRequestException('Phòng đã kín lịch trong khoảng thời gian này!');
     }
 
-<<<<<<< HEAD
-=======
     // Tính tiền
->>>>>>> upstream/main
     const oneDay = 24 * 60 * 60 * 1000;
     const diffDays = Math.round(
       Math.abs((endDate.getTime() - startDate.getTime()) / oneDay),
     );
     const totalPrice = Number(property.pricePerNight) * diffDays;
 
-<<<<<<< HEAD
-    return this.prisma.booking.create({
-=======
     // 1. TẠO BOOKING
     const newBooking = await this.prisma.booking.create({
->>>>>>> upstream/main
       data: {
         checkIn: startDate,
         checkOut: endDate,
@@ -115,9 +95,6 @@ export class BookingsService {
         cleaningFee: property.cleaningFee || 0,
         serviceFee: 0,
       },
-<<<<<<< HEAD
-    });
-=======
       include: {
         guest: true,
         property: true
@@ -139,7 +116,6 @@ export class BookingsService {
     }
 
     return newBooking;
->>>>>>> upstream/main
   }
 
   async getMyBookings(userId: number) {
@@ -150,28 +126,19 @@ export class BookingsService {
     });
   }
 
-<<<<<<< HEAD
-=======
   // --- HÀM CANCEL (ĐÃ SỬA LỖI) ---
->>>>>>> upstream/main
   async cancel(bookingId: number, userId: number) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
     });
 
     if (!booking) throw new NotFoundException('Không tìm thấy đơn đặt phòng');
-<<<<<<< HEAD
-    if (booking.guestId !== userId) {
-      throw new BadRequestException('Bạn không có quyền hủy đơn đặt phòng này');
-    }
-=======
     
     if (booking.guestId !== userId) {
       throw new BadRequestException('Bạn không có quyền hủy đơn đặt phòng này');
     } 
     // Đã xóa chữ 'khách' bị thừa ở đây
 
->>>>>>> upstream/main
     if (booking.status === 'CANCELLED') {
       throw new BadRequestException('Đơn này đã được hủy trước đó');
     }
@@ -184,8 +151,4 @@ export class BookingsService {
       data: { status: 'CANCELLED' },
     });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> upstream/main

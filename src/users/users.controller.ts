@@ -1,12 +1,17 @@
 import { BookingsService } from '../bookings/bookings.service';
 import { PropertiesService } from '../properties/properties.service';
 import {
-  Controller, Get, Body, Patch, UseGuards, Request,
-<<<<<<< HEAD
-  UseInterceptors, UploadedFile, BadRequestException, Param
-=======
-  UseInterceptors, UploadedFile, BadRequestException, Param, Query
->>>>>>> upstream/main
+  Controller,
+  Get,
+  Body,
+  Patch,
+  UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,6 +20,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateVerificationDto } from './dto/update-verification.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -23,20 +29,16 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly bookingsService: BookingsService,
-    private readonly propertiesService: PropertiesService
-  ) { }
-  // ADMIN: Thống kê tổng quan cho dashboard
+    private readonly propertiesService: PropertiesService,
+  ) {}
+
   @Get('/admin/stats')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   async getAdminStats() {
-    // Tổng số user
     const totalUsers = await this.usersService.countAll();
-    // Tổng số booking
     const totalBookings = await this.bookingsService.countAll();
-    // Tổng số property
     const totalProperties = await this.propertiesService.countAll();
-    // Tổng doanh thu (sum totalPrice của booking status COMPLETED)
     const totalRevenue = await this.bookingsService.sumRevenue();
     return { totalUsers, totalBookings, totalProperties, totalRevenue };
   }
@@ -46,45 +48,66 @@ export class UsersController {
     return this.usersService.findOne(req.user.id);
   }
 
-  // API UPDATE (Kèm upload ảnh)
   @Patch('profile')
-  @UseInterceptors(FileInterceptor('avatar')) // 'avatar' là tên key trong Form Data
+  @UseInterceptors(FileInterceptor('avatar'))
   async update(
     @Request() req,
     @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile() file: Express.Multer.File // Nhận file từ request
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    // Nếu có gửi file thì upload lên Cloudinary
     if (file) {
       const result = await this.cloudinaryService.uploadFile(file);
-      updateUserDto.avatar = result.secure_url; // Lấy link ảnh gán vào DTO
+      updateUserDto.avatar = result.secure_url;
     }
 
     return this.usersService.update(req.user.id, updateUserDto);
   }
 
-  // ADMIN: Đổi role user (GUEST <-> HOST <-> ADMIN)
   @Patch('role/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  async updateRole(@Request() req, @Param('id') id: string, @Body() body: { role: 'GUEST' | 'HOST' | 'ADMIN' }) {
-    if (!body.role) throw new BadRequestException('Thiếu role mới');
-    // Chỉ ADMIN mới được đổi role, kể cả đổi sang ADMIN
-    return this.usersService.updateRole(Number(id), body.role, { id: req.user.id, role: req.user.role });
+  async updateRole(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: { role: 'GUEST' | 'HOST' | 'ADMIN' },
+  ) {
+    if (!body.role) throw new BadRequestException('Thieu role moi');
+
+    return this.usersService.updateRole(Number(id), body.role, {
+      id: req.user.id,
+      role: req.user.role,
+    });
   }
 
-  // ADMIN: Lấy danh sách user
+  @Patch('verify/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async updateVerification(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: UpdateVerificationDto,
+  ) {
+    if (typeof body?.isVerified !== 'boolean') {
+      throw new BadRequestException('Thieu trang thai xac thuc');
+    }
+
+    return this.usersService.updateVerificationStatus(
+      Number(id),
+      body.isVerified,
+      {
+        id: req.user.id,
+        role: req.user.role,
+      },
+    );
+  }
+
   @Get('/admin/users')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-<<<<<<< HEAD
-  async getAllUsers() {
-=======
   async getAllUsers(@Query('role') role?: string) {
     if (role) {
       return this.usersService.findByRole(role as 'GUEST' | 'HOST' | 'ADMIN');
     }
->>>>>>> upstream/main
     return this.usersService.findAll();
   }
 }

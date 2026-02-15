@@ -4,30 +4,23 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-<<<<<<< HEAD
   constructor(private prisma: PrismaService) {}
-=======
-  constructor(private prisma: PrismaService) { }
->>>>>>> upstream/main
 
-  // 0. Đếm tổng số user
   async countAll() {
     return this.prisma.user.count();
   }
 
-  // 1. Lấy thông tin chi tiết user
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
 
-    if (!user) throw new NotFoundException('Người dùng không tồn tại');
+    if (!user) throw new NotFoundException('Nguoi dung khong ton tai');
 
     const { password, ...result } = user;
     return result;
   }
 
-  // 2. Cập nhật thông tin user
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.update({
       where: { id },
@@ -38,14 +31,13 @@ export class UsersService {
     return result;
   }
 
-  // 3. ADMIN: đổi role
   async updateRole(
     id: number,
     role: 'GUEST' | 'HOST' | 'ADMIN',
     currentUser?: { id: number; role: string },
   ) {
     if (currentUser && currentUser.role !== 'ADMIN') {
-      throw new ForbiddenException('Chỉ ADMIN mới được đổi vai trò người dùng!');
+      throw new ForbiddenException('Chi ADMIN moi duoc doi vai tro nguoi dung!');
     }
 
     const user = await this.prisma.user.update({
@@ -57,20 +49,45 @@ export class UsersService {
     return result;
   }
 
-  // 4. ADMIN: lấy danh sách user
+  async updateVerificationStatus(
+    id: number,
+    isVerified: boolean,
+    currentUser?: { id: number; role: string },
+  ) {
+    if (currentUser && currentUser.role !== 'ADMIN') {
+      throw new ForbiddenException('Chi ADMIN moi duoc xac thuc tai khoan!');
+    }
+
+    const targetUser = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!targetUser) {
+      throw new NotFoundException('Nguoi dung khong ton tai');
+    }
+
+    if (targetUser.role === 'ADMIN') {
+      throw new ForbiddenException('Khong the thay doi xac thuc cho ADMIN');
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: { isVerified },
+    });
+
+    const { password, ...result } = user;
+    return result;
+  }
+
   async findAll() {
     const users = await this.prisma.user.findMany();
     return users.map(({ password, ...rest }) => rest);
   }
-<<<<<<< HEAD
-=======
 
-  // 5. ADMIN: lấy danh sách user theo role
   async findByRole(role: 'GUEST' | 'HOST' | 'ADMIN') {
     const users = await this.prisma.user.findMany({
       where: { role },
     });
     return users.map(({ password, ...rest }) => rest);
   }
->>>>>>> upstream/main
 }

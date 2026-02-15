@@ -29,10 +29,7 @@ model User {
   receivedMessages Message[]      @relation("Receiver")
   wishlists        Wishlist[]
   notifications    Notification[]
-<<<<<<< HEAD
-=======
   sentNotifications Notification[] @relation("NotificationSender") // Thông báo đã gửi
->>>>>>> upstream/main
   
   // [SỬA LẠI ĐOẠN NÀY CHO KHỚP VỚI MODEL REPORT]
   reportsSent      Report[]       @relation("Reporter")   // Các báo cáo mình gửi đi
@@ -196,20 +193,14 @@ model Message {
 model Notification {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-<<<<<<< HEAD
-=======
   senderId  Int?     @map("sender_id") // Người gửi (optional, cho Admin gửi thông báo)
->>>>>>> upstream/main
   title     String
   message   String
   type      String
   isRead    Boolean  @default(false) @map("is_read")
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id])
-<<<<<<< HEAD
-=======
   sender    User?    @relation("NotificationSender", fields: [senderId], references: [id])
->>>>>>> upstream/main
   @@map("notifications")
 }
 
